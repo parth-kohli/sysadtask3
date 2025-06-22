@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  chat-server:
+    build: ./server
+    depends_on:
+      - db
+    networks:
+      - chatnet
+    ports:
+      - "5000:5000"
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: chatdb
+    networks:
+      - chatnet
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+volumes:
+  db-data:
+networks:
+  chatnet:
