@@ -53,7 +53,7 @@ def get_room_history(room, limit=50):
     )
     rows = cursor.fetchall()
     conn.close()
-    return list(reversed(rows))  # Show oldest first
+    return list(reversed(rows)) 
 
 def get_leaderboard(limit=10):
     conn = get_db_connection()
