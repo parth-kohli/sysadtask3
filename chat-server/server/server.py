@@ -19,7 +19,7 @@ def broadcast(message, room, sender_sock=None):
                 pass
 
 def handle_client(sock, addr):
-    sock.send(b"Welcome! Please /login <user> <pass> or /register <user> <pass>\n")
+    sock.send(b"Please /login <user> <pass> or /register <user> <pass>\n")
     username = None
     session_id = None
     while True:
@@ -36,7 +36,7 @@ def handle_client(sock, addr):
                 try:
                     pwd_hash = hashlib.sha256(pwd.encode()).hexdigest()
                     create_user(uname, pwd_hash)
-                    sock.send(b"Registered. Please /login now.\n")
+                    sock.send(b"Registered. Please /login <user> <pass> now\n")
                 except Exception as e:
                     sock.send(f"Registration failed: {e}\n".encode())
             elif data.startswith("/login"):
@@ -63,11 +63,11 @@ def handle_client(sock, addr):
                         continue
                     _, room = parts
                     if room in rooms:
-                        sock.send(f"Room '{room}' already exists.\n".encode())
+                        sock.send(f"Room '{room}' exists\n".encode())
                     else:
                         create_room(room)
                         rooms[room] = set()
-                        sock.send(f"Room '{room}' created successfully.\n".encode())
+                        sock.send(f"Room '{room}' created\n".encode())
 
                 elif data.startswith("/history"):
                     room = clients[sock]["room"]
@@ -79,9 +79,9 @@ def handle_client(sock, addr):
                                 line = f"[{ts.strftime('%H:%M')}] {sender}: {content}\n"
                                 sock.send(line.encode())
                         else:
-                            sock.send(b"No message history.\n")
+                            sock.send(b"No message history\n")
                     else:
-                        sock.send(b"You're not in a room.\n")
+                        sock.send(b"You're not in a room\n")
                          
                 elif data.startswith("/leaderboard"):
                     leaderboard = get_leaderboard()
@@ -91,7 +91,7 @@ def handle_client(sock, addr):
                             line = f"{i}. {sender} - {count} messages\n"
                             sock.send(line.encode())
                     else:
-                        sock.send(b"No messages yet.\n")
+                        sock.send(b"No messages yet\n")
                 elif data.startswith("/join"):
                     parts = data.split()
                     if len(parts) != 2:
@@ -116,7 +116,7 @@ def handle_client(sock, addr):
                         clients[sock]["room"] = None
                         sock.send(b"You left the room\n")
                     else:
-                        sock.send(b"You are not in a room.\n")
+                        sock.send(b"You are not in a room\n")
 
                 elif data.startswith("/list"):
                     room_list = ", ".join(rooms.keys()) or "No active rooms"
@@ -131,7 +131,7 @@ def handle_client(sock, addr):
                         users_in_room = [clients[c]["username"] for c in rooms[room]]
                         sock.send(f"Users in '{room}': {', '.join(users_in_room)}\n".encode())
                     else:
-                        sock.send(b"You're not in a room.\n")
+                        sock.send(b"You're not in a room\n")
 
                 else:
                     room = clients[sock]["room"]
@@ -140,9 +140,9 @@ def handle_client(sock, addr):
                         log_message(username, room, data)
                         broadcast(msg, room, sock)
                     else:
-                        sock.send(b"Join a room to chat.\n")
+                        sock.send(b"Join a room to chat\n")
             else:
-                sock.send(b" Please /login first.\n")
+                sock.send(b" Please /login first\n")
 
         except Exception as e:
             print(f"[ERROR] {e}")
